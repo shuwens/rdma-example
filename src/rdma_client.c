@@ -5,6 +5,10 @@
  */
 
 #include "rdma_common.h"
+#include <chrono>
+#include <stdio.h>
+
+using chrono_tp = std::chrono::high_resolution_clock::time_point;
 
 /* These are basic RDMA resources */
 /* These are RDMA connection related resources */
@@ -501,11 +505,21 @@ int main(int argc, char **argv) {
     rdma_error("Failed to setup client connection , ret = %d \n", ret);
     return ret;
   }
+
+  // inst to check time
+  auto stime = std::chrono::high_resolution_clock::now();
+
   ret = client_remote_memory_ops();
   if (ret) {
     rdma_error("Failed to finish remote memory ops, ret = %d \n", ret);
     return ret;
   }
+
+  auto etime = std::chrono::high_resolution_clock::now();
+  auto dur =
+      std::chrono::duration_cast<std::chrono::microseconds>(etime - stime);
+  printf("Time taken for RDMA ops : %ld us \n", dur.count());
+
   if (check_src_dst()) {
     rdma_error("src and dst buffers do not match \n");
   } else {
