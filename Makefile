@@ -142,80 +142,80 @@ rdma_client/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_client.dir/build.make CMakeFiles/rdma_client.dir/build
 .PHONY : rdma_client/fast
 
-src/rdma_client.o: src/rdma_client.c.o
+src/rdma_client.o: src/rdma_client.cc.o
 .PHONY : src/rdma_client.o
 
 # target to build an object file
-src/rdma_client.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_client.dir/build.make CMakeFiles/rdma_client.dir/src/rdma_client.c.o
-.PHONY : src/rdma_client.c.o
+src/rdma_client.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_client.dir/build.make CMakeFiles/rdma_client.dir/src/rdma_client.cc.o
+.PHONY : src/rdma_client.cc.o
 
-src/rdma_client.i: src/rdma_client.c.i
+src/rdma_client.i: src/rdma_client.cc.i
 .PHONY : src/rdma_client.i
 
 # target to preprocess a source file
-src/rdma_client.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_client.dir/build.make CMakeFiles/rdma_client.dir/src/rdma_client.c.i
-.PHONY : src/rdma_client.c.i
+src/rdma_client.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_client.dir/build.make CMakeFiles/rdma_client.dir/src/rdma_client.cc.i
+.PHONY : src/rdma_client.cc.i
 
-src/rdma_client.s: src/rdma_client.c.s
+src/rdma_client.s: src/rdma_client.cc.s
 .PHONY : src/rdma_client.s
 
 # target to generate assembly for a file
-src/rdma_client.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_client.dir/build.make CMakeFiles/rdma_client.dir/src/rdma_client.c.s
-.PHONY : src/rdma_client.c.s
+src/rdma_client.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_client.dir/build.make CMakeFiles/rdma_client.dir/src/rdma_client.cc.s
+.PHONY : src/rdma_client.cc.s
 
-src/rdma_common.o: src/rdma_common.c.o
+src/rdma_common.o: src/rdma_common.cc.o
 .PHONY : src/rdma_common.o
 
 # target to build an object file
-src/rdma_common.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_server.dir/build.make CMakeFiles/rdma_server.dir/src/rdma_common.c.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_client.dir/build.make CMakeFiles/rdma_client.dir/src/rdma_common.c.o
-.PHONY : src/rdma_common.c.o
+src/rdma_common.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_server.dir/build.make CMakeFiles/rdma_server.dir/src/rdma_common.cc.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_client.dir/build.make CMakeFiles/rdma_client.dir/src/rdma_common.cc.o
+.PHONY : src/rdma_common.cc.o
 
-src/rdma_common.i: src/rdma_common.c.i
+src/rdma_common.i: src/rdma_common.cc.i
 .PHONY : src/rdma_common.i
 
 # target to preprocess a source file
-src/rdma_common.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_server.dir/build.make CMakeFiles/rdma_server.dir/src/rdma_common.c.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_client.dir/build.make CMakeFiles/rdma_client.dir/src/rdma_common.c.i
-.PHONY : src/rdma_common.c.i
+src/rdma_common.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_server.dir/build.make CMakeFiles/rdma_server.dir/src/rdma_common.cc.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_client.dir/build.make CMakeFiles/rdma_client.dir/src/rdma_common.cc.i
+.PHONY : src/rdma_common.cc.i
 
-src/rdma_common.s: src/rdma_common.c.s
+src/rdma_common.s: src/rdma_common.cc.s
 .PHONY : src/rdma_common.s
 
 # target to generate assembly for a file
-src/rdma_common.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_server.dir/build.make CMakeFiles/rdma_server.dir/src/rdma_common.c.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_client.dir/build.make CMakeFiles/rdma_client.dir/src/rdma_common.c.s
-.PHONY : src/rdma_common.c.s
+src/rdma_common.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_server.dir/build.make CMakeFiles/rdma_server.dir/src/rdma_common.cc.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_client.dir/build.make CMakeFiles/rdma_client.dir/src/rdma_common.cc.s
+.PHONY : src/rdma_common.cc.s
 
-src/rdma_server.o: src/rdma_server.c.o
+src/rdma_server.o: src/rdma_server.cc.o
 .PHONY : src/rdma_server.o
 
 # target to build an object file
-src/rdma_server.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_server.dir/build.make CMakeFiles/rdma_server.dir/src/rdma_server.c.o
-.PHONY : src/rdma_server.c.o
+src/rdma_server.cc.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_server.dir/build.make CMakeFiles/rdma_server.dir/src/rdma_server.cc.o
+.PHONY : src/rdma_server.cc.o
 
-src/rdma_server.i: src/rdma_server.c.i
+src/rdma_server.i: src/rdma_server.cc.i
 .PHONY : src/rdma_server.i
 
 # target to preprocess a source file
-src/rdma_server.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_server.dir/build.make CMakeFiles/rdma_server.dir/src/rdma_server.c.i
-.PHONY : src/rdma_server.c.i
+src/rdma_server.cc.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_server.dir/build.make CMakeFiles/rdma_server.dir/src/rdma_server.cc.i
+.PHONY : src/rdma_server.cc.i
 
-src/rdma_server.s: src/rdma_server.c.s
+src/rdma_server.s: src/rdma_server.cc.s
 .PHONY : src/rdma_server.s
 
 # target to generate assembly for a file
-src/rdma_server.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_server.dir/build.make CMakeFiles/rdma_server.dir/src/rdma_server.c.s
-.PHONY : src/rdma_server.c.s
+src/rdma_server.cc.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rdma_server.dir/build.make CMakeFiles/rdma_server.dir/src/rdma_server.cc.s
+.PHONY : src/rdma_server.cc.s
 
 # Help Target
 help:
