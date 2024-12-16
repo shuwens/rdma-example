@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <string>
+#include <vector>
 
 using chrono_tp = std::chrono::high_resolution_clock::time_point;
 
@@ -488,21 +489,42 @@ int main(int argc, char **argv) {
   server_sockaddr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
   /* buffers are NULL */
   src = dst = NULL;
+  std::string input_str = "";
+  int hash_size = 4096;
+
+  // int repeat_times = 50;
+  // std::vector<int> lats;
+  // lats.reserve(repeat_times);
+
+  std::string test = "Hello, World!";
+  // std::string test = "textstringte";
+  // std::string test = "deadbeefandcafebabe";
+  // std::string test = "textstringte";
+
+  for (int i = 0; i < hash_size; i++) {
+    input_str += sha256(test);
+  }
+
   /* Parse Command Line Arguments */
   while ((option = getopt(argc, argv, "s:a:p:")) != -1) {
     switch (option) {
     case 's':
-      printf("Passed string is : %s , with count %u \n", optarg,
-             (unsigned int)strlen(optarg));
+      printf("Passed string is : %s , with count %u \n", input_str.c_str(),
+             (unsigned int)strlen(input_str.c_str()));
 
-      src = calloc(strlen(optarg), 1);
+      src = calloc(strlen(input_str.c_str()), 1);
+
       if (!src) {
         rdma_error("Failed to allocate memory : -ENOMEM\n");
         return -ENOMEM;
       }
       /* Copy the passes arguments */
-      strncpy(src, optarg, strlen(optarg));
-      dst = calloc(strlen(optarg), 1);
+      // strncpy(src, optarg, strlen(optarg));
+      strncpy(src, input_str.c_str(), strlen(input_str.c_str()));
+      dst = calloc(strlen(input_str.c_str()), 1);
+
+      // dst = calloc(strlen(test.c_str()), 1);
+      // dst = (char *)test.c_str();
 
       if (!dst) {
         rdma_error("Failed to allocate destination memory, -ENOMEM\n");
@@ -550,6 +572,9 @@ int main(int argc, char **argv) {
     rdma_error("Failed to setup client connection , ret = %d \n", ret);
     return ret;
   }
+
+  // for (int i = 0; i < repeat_times; i++) {
+
   ret = client_xchange_metadata_with_server();
   if (ret) {
     rdma_error("Failed to setup client connection , ret = %d \n", ret);
@@ -569,12 +594,15 @@ int main(int argc, char **argv) {
   auto dur =
       std::chrono::duration_cast<std::chrono::microseconds>(etime - stime);
   printf("Time taken for RDMA ops : %ld us \n", dur.count());
+  // lats.push_back(dur.count());
 
   if (check_src_dst()) {
     rdma_error("src and dst buffers do not match \n");
   } else {
     printf("...\nSUCCESS, source and destination buffers match \n");
   }
+  // }
+
   ret = client_disconnect_and_clean();
   if (ret) {
     rdma_error("Failed to cleanly disconnect and clean up resources \n");
