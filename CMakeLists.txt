@@ -1,6 +1,6 @@
 # Author : Animesh Trivedi
 
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.5)
 
 project (rdma-example)
 
@@ -9,7 +9,7 @@ set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
@@ -22,6 +22,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -Ofast -std=c++20 -ffast-math -fperm
 #add_compile_options("-std=c++17")
 #set(CMAKE_CXX_FLAGS "-O0  -ggdb")
 
+find_package(OpenSSL REQUIRED)
+
 find_library(IBVERBS_LIBRARY ibverbs HINTS /home/shwsun/local/lib)
 find_library(RDMACM_LIBRARY rdmacm HINTS /home/shwsun/local/lib)
 
@@ -31,4 +33,5 @@ include_directories("${PROJECT_SOURCE_DIR}" "/home/shwsun/local/include/")
 
 add_executable(rdma_server ${PROJECT_SOURCE_DIR}/rdma_common.cc ${PROJECT_SOURCE_DIR}/rdma_server.cc)
 add_executable(rdma_client ${PROJECT_SOURCE_DIR}/rdma_common.cc ${PROJECT_SOURCE_DIR}/rdma_client.cc)
+target_link_libraries(rdma_client OpenSSL::SSL)
 

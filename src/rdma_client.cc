@@ -6,7 +6,10 @@
 
 #include "rdma_common.h"
 #include <chrono>
+#include <openssl/sha.h>
 #include <stdio.h>
+#include <string.h>
+#include <string>
 
 using chrono_tp = std::chrono::high_resolution_clock::time_point;
 
@@ -28,6 +31,51 @@ static struct ibv_recv_wr server_recv_wr, *bad_server_recv_wr = NULL;
 static struct ibv_sge client_send_sge, server_recv_sge;
 /* Source and Destination buffers, where RDMA operations source and sink */
 static char *src = NULL, *dst = NULL;
+
+void sha256_hash_string(unsigned char hash[SHA256_DIGEST_LENGTH],
+                        char outputBuffer[65]) {
+  int i = 0;
+
+  for (i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+    sprintf(outputBuffer + (i * 2), "%02x", hash[i]);
+  }
+
+  outputBuffer[64] = 0;
+}
+
+void sha256_char_str(const char *string, char outputBuffer[65]) {
+  unsigned char hash[SHA256_DIGEST_LENGTH];
+  SHA256_CTX sha256;
+  SHA256_Init(&sha256);
+  SHA256_Update(&sha256, string, strlen(string));
+  SHA256_Final(hash, &sha256);
+  int i = 0;
+  for (i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+    sprintf(outputBuffer + (i * 2), "%02x", hash[i]);
+  }
+  outputBuffer[64] = 0;
+}
+
+// Function to compute SHA-256 hash from a string_view
+std::string sha256(std::string_view input) {
+  // Buffer to store the SHA-256 hash
+  unsigned char hash[SHA256_DIGEST_LENGTH];
+
+  // Compute the SHA-256 hash
+  SHA256_CTX sha256;
+  SHA256_Init(&sha256);
+  SHA256_Update(&sha256, input.data(), input.size());
+  SHA256_Final(hash, &sha256);
+
+  // Convert hash to a hexadecimal string
+  std::stringstream ss;
+  for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
+    ss << std::hex << std::setw(2) << std::setfill('0')
+       << static_cast<int>(hash[i]);
+  }
+
+  return ss.str();
+}
 
 /* This is our testing function */
 static int check_src_dst() {
@@ -446,6 +494,7 @@ int main(int argc, char **argv) {
     case 's':
       printf("Passed string is : %s , with count %u \n", optarg,
              (unsigned int)strlen(optarg));
+
       src = calloc(strlen(optarg), 1);
       if (!src) {
         rdma_error("Failed to allocate memory : -ENOMEM\n");
@@ -454,6 +503,7 @@ int main(int argc, char **argv) {
       /* Copy the passes arguments */
       strncpy(src, optarg, strlen(optarg));
       dst = calloc(strlen(optarg), 1);
+
       if (!dst) {
         rdma_error("Failed to allocate destination memory, -ENOMEM\n");
         free(src);
