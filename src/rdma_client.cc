@@ -351,6 +351,10 @@ static int client_remote_memory_ops() {
     rdma_error("We failed to create the destination buffer, -ENOMEM\n");
     return -ENOMEM;
   }
+
+  // inst to check time
+  auto stime = std::chrono::high_resolution_clock::now();
+
   /* Step 1: is to copy the local buffer into the remote buffer. We will
    * reuse the previous variables. */
   /* now we fill up SGE */
@@ -378,6 +382,13 @@ static int client_remote_memory_ops() {
     rdma_error("We failed to get 1 work completions , ret = %d \n", ret);
     return ret;
   }
+
+  auto etime = std::chrono::high_resolution_clock::now();
+  auto dur =
+      std::chrono::duration_cast<std::chrono::microseconds>(etime - stime);
+  printf("Time taken for RDMA ops : %ld us \n", dur.count());
+  // lats.push_back(dur.count());
+
   debug("Client side WRITE is complete \n");
   /* Now we prepare a READ using same variables but for destination */
   client_send_sge.addr = (uint64_t)client_dst_mr->addr;
@@ -581,21 +592,11 @@ int main(int argc, char **argv) {
     return ret;
   }
 
-  // inst to check time
-  auto stime = std::chrono::high_resolution_clock::now();
-
   ret = client_remote_memory_ops();
   if (ret) {
     rdma_error("Failed to finish remote memory ops, ret = %d \n", ret);
     return ret;
   }
-
-  auto etime = std::chrono::high_resolution_clock::now();
-  auto dur =
-      std::chrono::duration_cast<std::chrono::microseconds>(etime - stime);
-  printf("Time taken for RDMA ops : %ld us \n", dur.count());
-  // lats.push_back(dur.count());
-
   if (check_src_dst()) {
     rdma_error("src and dst buffers do not match \n");
   } else {
