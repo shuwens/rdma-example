@@ -501,7 +501,9 @@ int main(int argc, char **argv) {
   /* buffers are NULL */
   src = dst = NULL;
   std::string input_str = "";
-  int hash_size = 4096;
+
+  // int hash_size = 4096;
+  int hash_size = 1;
 
   // int repeat_times = 50;
   // std::vector<int> lats;

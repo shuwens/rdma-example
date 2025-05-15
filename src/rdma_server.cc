@@ -47,9 +47,9 @@ static int setup_client_resources() {
    * in the operating system. All resources are tied to a particular PD.
    * And accessing recourses across PD will result in a protection fault.
    */
-  pd = ibv_alloc_pd(cm_client_id->verbs 
-			/* verbs defines a verb's provider, 
-			 * i.e an RDMA device where the incoming 
+  pd = ibv_alloc_pd(cm_client_id->verbs
+			/* verbs defines a verb's provider,
+			 * i.e an RDMA device where the incoming
 			 * client connection came */);
   if (!pd) {
     rdma_error("Failed to allocate a protection domain errno: %d\n", -errno);
@@ -293,6 +293,7 @@ static int send_server_metadata_to_client() {
          client_metadata_attr.length);
   /* We need to setup requested memory buffer. This is where the client will
    * do RDMA READs and WRITEs. */
+  // Note: allocate memory buffer for client
   server_buffer_mr =
       rdma_buffer_alloc(pd /* which protection domain */,
                         client_metadata_attr.length /* what size to allocate */,
@@ -310,6 +311,7 @@ static int send_server_metadata_to_client() {
    * We need to prepare a send I/O operation that will tell the
    * client the address of the server buffer.
    */
+  // Metadata about the server buffer
   server_metadata_attr.address = (uint64_t)server_buffer_mr->addr;
   server_metadata_attr.length = (uint32_t)server_buffer_mr->length;
   server_metadata_attr.stag.local_stag = (uint32_t)server_buffer_mr->lkey;
@@ -354,6 +356,77 @@ static int send_server_metadata_to_client() {
   return 0;
 }
 
+static int show_server_buffer() {
+  struct rdma_cm_event *cm_event = NULL;
+  int ret = -1;
+  /* Now we wait for the client to send us disconnect event */
+  debug("Waiting for cm event: RDMA_CM_EVENT_DISCONNECTED\n");
+  ret = process_rdma_cm_event(cm_event_channel, RDMA_CM_EVENT_DISCONNECTED,
+                              &cm_event);
+  if (ret) {
+    rdma_error("Failed to get disconnect event, ret = %d \n", ret);
+    return ret;
+  }
+  /* We acknowledge the event */
+  ret = rdma_ack_cm_event(cm_event);
+  if (ret) {
+    rdma_error("Failed to acknowledge the cm event %d\n", -errno);
+    return -errno;
+  }
+  printf("A disconnect event is received from the client...\n");
+  /* We free all the resources */
+  /* Destroy QP */
+  rdma_destroy_qp(cm_client_id);
+  /* Destroy client cm id */
+  ret = rdma_destroy_id(cm_client_id);
+  if (ret) {
+    rdma_error("Failed to destroy client id cleanly, %d \n", -errno);
+    // we continue anyways;
+  }
+  /* Destroy CQ */
+  ret = ibv_destroy_cq(cq);
+  if (ret) {
+    rdma_error("Failed to destroy completion queue cleanly, %d \n", -errno);
+    // we continue anyways;
+  }
+  /* Destroy completion channel */
+  ret = ibv_destroy_comp_channel(io_completion_channel);
+  if (ret) {
+    rdma_error("Failed to destroy completion channel cleanly, %d \n", -errno);
+    // we continue anyways;
+  }
+  // printf("Server buffer as ASCII:\n");
+  unsigned char *buffer_data = (unsigned char *)server_buffer_mr->addr;
+  for (uint32_t i = 0; i < server_buffer_mr->length; i++) {
+    char c = buffer_data[i];
+    printf("%c", (c >= 32 && c <= 126) ? c : '.');
+    if ((i + 1) % 64 == 0 || i == server_buffer_mr->length - 1) {
+      printf("\n");
+    }
+  }
+
+  /* Destroy memory buffers */
+  rdma_buffer_free(server_buffer_mr);
+  rdma_buffer_deregister(server_metadata_mr);
+  rdma_buffer_deregister(client_metadata_mr);
+  /* Destroy protection domain */
+  ret = ibv_dealloc_pd(pd);
+  if (ret) {
+    rdma_error("Failed to destroy client protection domain cleanly, %d \n",
+               -errno);
+    // we continue anyways;
+  }
+  /* Destroy rdma server id */
+  ret = rdma_destroy_id(cm_server_id);
+  if (ret) {
+    rdma_error("Failed to destroy server id cleanly, %d \n", -errno);
+    // we continue anyways;
+  }
+  rdma_destroy_event_channel(cm_event_channel);
+  printf("Server shut-down is complete \n");
+  return 0;
+}
+
 /* This is server side logic. Server passively waits for the client to call
  * rdma_disconnect() and then it will clean up its resources */
 static int disconnect_and_cleanup() {
@@ -395,6 +468,16 @@ static int disconnect_and_cleanup() {
     rdma_error("Failed to destroy completion channel cleanly, %d \n", -errno);
     // we continue anyways;
   }
+  // printf("Server buffer as ASCII:\n");
+  unsigned char *buffer_data = (unsigned char *)server_buffer_mr->addr;
+  for (uint32_t i = 0; i < server_buffer_mr->length; i++) {
+    char c = buffer_data[i];
+    printf("%c", (c >= 32 && c <= 126) ? c : '.');
+    if ((i + 1) % 64 == 0 || i == server_buffer_mr->length - 1) {
+      printf("\n");
+    }
+  }
+
   /* Destroy memory buffers */
   rdma_buffer_free(server_buffer_mr);
   rdma_buffer_deregister(server_metadata_mr);
